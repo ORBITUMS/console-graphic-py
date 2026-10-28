@@ -58,7 +58,8 @@ def DoFrame(pixels: list): # xyz: xyzclass
     print("")
 
 def CreateFrame(pixels: list, len: int): # xyz: xyzclass
-  a = create(15,15)
+  global TerminalFrameSize
+  a = create(TerminalFrameSize,TerminalFrameSize)
   Symbols_len = len-1
   for pix in pixels:
     z = pix.z
@@ -84,19 +85,22 @@ def create(lines: int, columns: int):
 # pixels = [pixel(2,3,1)]
 
 if __name__ == "__main__":
+  TerminalFrameSize = 30
+
 
   sys.stdout.write("\033[2J\033[H")
   sys.stdout.flush()
-  pixels = obj.cybe(2)  # cybe or line
+  pixels = obj.ventilator(5) # cybe or line
+
 
   listener = keyboard.Listener(on_press=on_press, on_release=on_release)
   listener.start()
 
   try:
     while listener.running:
-      time.sleep(1/24)
+      time.sleep(1/10)
       process_actions()
-
+      pixels = obj.VentRot(pixels)
       sys.stdout.write("\033[H")
       DoFrame(pixels)
       sys.stdout.flush()
@@ -106,7 +110,7 @@ if __name__ == "__main__":
     sys.stdout.write("\033[2J\033[H")
     sys.stdout.flush()
     print("")
-    print("Вы выход из цикла.", end="\n\n\n")
+    print("Вы вышли из цикла.", end="\n\n\n")
 
 
 
