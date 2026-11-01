@@ -65,11 +65,12 @@ def CreateFrame(pixels: list, len: int): # xyz: xyzclass
     z = pix.z
     if z > Symbols_len:
       z = Symbols_len
-    
-    try:
-      a[pix.y][pix.x] = z
-    except:
-      pass
+
+    ms = TerminalFrameSize
+    x = pix.x
+    y = pix.y
+    if x > -1 and x < ms and y > -1 and y < ms:
+      a[y][x] = z
   return a
 
 def create(lines: int, columns: int):
@@ -85,12 +86,12 @@ def create(lines: int, columns: int):
 # pixels = [pixel(2,3,1)]
 
 if __name__ == "__main__":
-  TerminalFrameSize = 30
+  TerminalFrameSize = 20
 
 
   sys.stdout.write("\033[2J\033[H")
   sys.stdout.flush()
-  pixels = obj.ventilator(5) # cybe or line
+  pixels = obj.cybe(5) # cybe or line
 
 
   listener = keyboard.Listener(on_press=on_press, on_release=on_release)
@@ -100,7 +101,7 @@ if __name__ == "__main__":
     while listener.running:
       time.sleep(1/10)
       process_actions()
-      pixels = obj.VentRot(pixels)
+      # pixels = obj.VentRot(pixels)
       sys.stdout.write("\033[H")
       DoFrame(pixels)
       sys.stdout.flush()
