@@ -1,5 +1,5 @@
 # objects
-import math
+# import math
 
 class pixel:
   def __init__(self,x:int,y:int,z:int):
@@ -36,6 +36,16 @@ def ventilator(size: int):
   for i in range(size):
     px = pixel(4,i+2,1)
     pixels += [px]
+  return pixels
+
+def map(size: int):
+  pixels = []
+  for y in range(size):
+    for x in range(size):
+      px = pixel(x-size//2,y,10)
+      pixels += [px]
+      px = pixel(x-size//2,y,-10)
+      pixels += [px]
   return pixels
 
 def VentRot(pixels: list):

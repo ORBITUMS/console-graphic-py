@@ -28,20 +28,25 @@ def process_actions():
   global actions
   for ev in actions:
     if ev == Key.up    or ev == 'w': 
-      for px in pixels: px.y += 1
+      for px in pixels: px.z -= 1
     elif ev == Key.down  or ev == 's': 
-      for px in pixels: px.y -= 1
+      for px in pixels: px.z += 1
     elif ev == Key.left  or ev == 'a': 
       for px in pixels: px.x += 1
     elif ev == Key.right or ev == 'd': 
       for px in pixels: px.x -= 1
-    elif ev == Key.shift_r: 
-      for px in pixels: px.z += 1
-    elif ev == Key.shift_l: 
-      for px in pixels: px.z -= 1
+    elif ev == Key.shift_r or ev == "e": 
+      for px in pixels:
+        x,z = px.x, px.z  
+        px.z,px.x = x,-z
+        
+    elif ev == Key.shift_l or ev == "q": 
+      for px in pixels:
+        x,z = px.x, px.z  
+        px.z,px.x = -x,z
 
-    elif ev == Key.alt_l or ev == Key.alt_r:
-      for px in pixels: px.x, px.z = px.z, px.x
+    #elif ev == Key.alt_l or ev == Key.alt_r:
+    #  for px in pixels: px.x, px.z = px.z, px.x
 
   actions.clear()
 
@@ -58,19 +63,23 @@ def DoFrame(pixels: list): # xyz: xyzclass
     print("")
 
 def CreateFrame(pixels: list, len: int): # xyz: xyzclass
-  global TerminalFrameSize
+  global TerminalFrameSize, fog
   a = create(TerminalFrameSize,TerminalFrameSize)
   Symbols_len = len-1
   for pix in pixels:
     z = pix.z
-    if z > Symbols_len:
-      z = Symbols_len
+    if z > 0:
+      if z > Symbols_len and z > fog:
+        z = 0
+      elif z > Symbols_len:
+        z = Symbols_len
 
-    ms = TerminalFrameSize
-    x = pix.x+5
-    y = pix.y
-    if x > -1 and x < ms and y > -1 and y < ms:
-      a[y][x] = z
+
+      ms = TerminalFrameSize
+      x = pix.x+10
+      y = pix.y
+      if x > -1 and x < ms and y > -1 and y < ms:
+        a[y][x] = z
   return a
 
 def create(lines: int, columns: int):
@@ -86,12 +95,13 @@ def create(lines: int, columns: int):
 # pixels = [pixel(2,3,1)]
 
 if __name__ == "__main__":
-  TerminalFrameSize = 20
+  TerminalFrameSize = int(input("20: "))
+  fog = 20
 
 
   sys.stdout.write("\033[2J\033[H")
   sys.stdout.flush()
-  pixels = obj.cybe(5) # cybe or line
+  pixels = obj.map(6) # cybe or line or map( size === 0 mod 2)
 
 
   listener = keyboard.Listener(on_press=on_press, on_release=on_release)
