@@ -32,9 +32,9 @@ def process_actions():
     elif ev == Key.down  or ev == 's': 
       for px in pixels: px.y -= 1
     elif ev == Key.left  or ev == 'a': 
-      for px in pixels: px.x -= 1
-    elif ev == Key.right or ev == 'd': 
       for px in pixels: px.x += 1
+    elif ev == Key.right or ev == 'd': 
+      for px in pixels: px.x -= 1
     elif ev == Key.shift_r: 
       for px in pixels: px.z += 1
     elif ev == Key.shift_l: 
@@ -67,7 +67,7 @@ def CreateFrame(pixels: list, len: int): # xyz: xyzclass
       z = Symbols_len
 
     ms = TerminalFrameSize
-    x = pix.x
+    x = pix.x+5
     y = pix.y
     if x > -1 and x < ms and y > -1 and y < ms:
       a[y][x] = z
