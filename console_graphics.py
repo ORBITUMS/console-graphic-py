@@ -79,7 +79,8 @@ def CreateFrame(pixels: list, len: int): # xyz: xyzclass
       x = pix.x+10
       y = pix.y
       if x > -1 and x < ms and y > -1 and y < ms:
-        a[y][x] = z
+        if a[y][x] < z:
+          a[y][x] = z
   return a
 
 def create(lines: int, columns: int):
