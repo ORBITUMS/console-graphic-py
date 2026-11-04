@@ -51,13 +51,13 @@ def process_actions():
   actions.clear()
 
 def DoFrame(pixels: list): # xyz: xyzclass
-  symbols = [" ","█", "▓", "▒", "░", "≡", "=", "-", "."]
+  symbols = [" ","█", "▓", "▒", "░", "≡", "=", "-", ".", "/"]
   Frame = CreateFrame(pixels, len(symbols))
   for i in reversed(range(len(Frame))):
     for j in range(len(Frame[i])):
       try:
         print(symbols[Frame[i][j]]*2, end="")
-        # print(Frame[i][j], end="")
+        #print(Frame[i][j], end="")
       except:
         pass
     print("")
@@ -66,21 +66,22 @@ def CreateFrame(pixels: list, len: int): # xyz: xyzclass
   global TerminalFrameSize, fog
   a = create(TerminalFrameSize,TerminalFrameSize)
   Symbols_len = len-1
+  maxsize = TerminalFrameSize
   for pix in pixels:
     z = pix.z
-    if z > 0:
-      if z > Symbols_len and z > fog:
-        z = 0
-      elif z > Symbols_len:
-        z = Symbols_len
-
-
-      ms = TerminalFrameSize
-      x = pix.x+10
+    #if z >= 0:
+    if z > fog:
+      z = 0
+    elif z > Symbols_len-1:
+      z = Symbols_len-1
+    elif z == 0:
+      z = Symbols_len
+      
+    if camera.z <= z:
+      x = pix.x + int(maxsize/2)
       y = pix.y
-      if x > -1 and x < ms and y > -1 and y < ms:
-        if a[y][x] < z:
-          a[y][x] = z
+      if x > -1 and x < maxsize and y > -1 and y < maxsize:
+        a[y][x] = z
   return a
 
 def create(lines: int, columns: int):
@@ -103,7 +104,7 @@ if __name__ == "__main__":
   sys.stdout.write("\033[2J\033[H")
   sys.stdout.flush()
   pixels = obj.map(6) # cybe or line or map( size === 0 mod 2)
-
+  camera = obj.pixel(0,0,0)
 
   listener = keyboard.Listener(on_press=on_press, on_release=on_release)
   listener.start()

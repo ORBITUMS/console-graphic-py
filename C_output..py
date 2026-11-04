@@ -1,3 +1,4 @@
 # Console output
 
-print(int(3/2))
+a = [1,3,3]
+print(len(a))
