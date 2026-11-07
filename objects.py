@@ -59,4 +59,4 @@ def VentRot(pixels: list):
 
   pixels[max1].x =+1
   return pixels
-  
+

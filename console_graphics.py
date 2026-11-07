@@ -7,7 +7,7 @@ from pynput import keyboard
 from pynput.keyboard import Key, KeyCode
 
 import objects as obj
-
+import editor as ed
 
 actions = [] # все действия за текущий кадр
 
@@ -51,81 +51,85 @@ def process_actions():
   actions.clear()
 
 def DoFrame(pixels: list): # xyz: xyzclass
-  symbols = [" ","█", "▓", "▒", "░", "≡", "=", "-", ".", "/"]
+  symbols = ["/","█", "▓", "▒", "░", "≡", "=", "-", "."," "]
   Frame = CreateFrame(pixels, len(symbols))
-  for i in reversed(range(len(Frame))):
-    for j in range(len(Frame[i])):
+  Buf_Frame = ""
+  lines = []
+  for y in reversed(range(len(Frame))):
+    for x in range(len(Frame[y])):
       try:
-        print(symbols[Frame[i][j]]*2, end="")
-        #print(Frame[i][j], end="")
+        Buf_Frame += symbols[Frame[y][x]]*2
+        # Buf_Frame += str(Frame[y][x])
       except:
         pass
-    print("")
+    lines += [Buf_Frame]
+    Buf_Frame = ""
+    #print(Frame[i][j], end="")
+  sys.stdout.write("\033[H" + "\n".join(lines) + "\n")
+  sys.stdout.flush()
 
-def CreateFrame(pixels: list, len: int): # xyz: xyzclass
-  global TerminalFrameSize, fog
-  a = create(TerminalFrameSize,TerminalFrameSize)
-  Symbols_len = len-1
-  maxsize = TerminalFrameSize
+def CreateFrame(pixels: list, symbol_count: int): # xyz: xyzclass
+  global TFS, fog
+  Symbols_len = symbol_count-1
+  A = [[Symbols_len]*TFS for _ in range(TFS)] # [[0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]
+  TFS = TFS
+  half = TFS//2
   for pix in pixels:
     z = pix.z
-    #if z >= 0:
-    if z > fog:
-      z = 0
-    elif z > Symbols_len-1:
+    if not fog > z:
+      continue
+    elif Symbols_len-1 < z:
       z = Symbols_len-1
-    elif z == 0:
-      z = Symbols_len
       
-    if camera.z <= z:
-      x = pix.x + int(maxsize/2)
-      y = pix.y
-      if x > -1 and x < maxsize and y > -1 and y < maxsize:
-        a[y][x] = z
-  return a
-
-def create(lines: int, columns: int):
-  a = []
-  for _ in range(lines):
-    line = []
-    line += [0]*columns # " "
-    a += [line] # or a.append(line)
-  return a
-
+    #if 0 <= z: # if camera.z <= z:
+    x = pix.x + half
+    y = pix.y + half
+    if x >= 0 and x < TFS and y >= 0 and y < TFS and z >= 0:
+      if A[y][x] > z:
+        A[y][x] = z
+  return A
 
 # xyz = xyzclass(0,0,1)
 # pixels = [pixel(2,3,1)]
+def start():
+    global TFS, fog, FPS, pixels, camera
+    settings = bool(input("start game 1 - yes, 0 - settings: "))
 
-if __name__ == "__main__":
-  TerminalFrameSize = int(input("20: "))
-  fog = 20
+    if settings:
+      TFS = int(input("20: "))  # TerminalFrameSize
+      fog = int(input("Fog: "))
+      FPS = int(input("FPS: "))
+    else:
+      TFS = 24
+      fog = 20
+      FPS = 10
 
-
-  sys.stdout.write("\033[2J\033[H")
-  sys.stdout.flush()
-  pixels = obj.map(6) # cybe or line or map( size === 0 mod 2)
-  camera = obj.pixel(0,0,0)
-
-  listener = keyboard.Listener(on_press=on_press, on_release=on_release)
-  listener.start()
-
-  try:
-    while listener.running:
-      time.sleep(1/10)
-      process_actions()
-      # pixels = obj.VentRot(pixels)
-      sys.stdout.write("\033[H")
-      DoFrame(pixels)
-      sys.stdout.flush()
-
-  finally:
-    listener.stop()
     sys.stdout.write("\033[2J\033[H")
     sys.stdout.flush()
-    print("")
-    print("Вы вышли из цикла.", end="\n\n\n")
+    pixels = ed.pixels         # obj.map(6) cybe or line or map( size === 0 mod 2)
+    camera = obj.pixel(0, 0, 0)
+
+    listener = keyboard.Listener(on_press=on_press, on_release=on_release)
+    listener.start()
+
+    try:
+        while listener.running:
+            time.sleep(1/FPS)
+            process_actions()
+            # pixels = obj.VentRot(pixels)
+            sys.stdout.write("\033[H")
+            DoFrame(pixels)
+            sys.stdout.flush()
+    finally:
+        listener.stop()
+        sys.stdout.write("\033[2J\033[H")
+        sys.stdout.flush()
+        print("")
+        print("Вы вышли из цикла.", end="\n\n\n")
 
 
+if __name__ == "__main__":
+    start()
 
 # pixels = []
 # for el in pixels:
